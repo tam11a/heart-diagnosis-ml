@@ -21,7 +21,7 @@ def calculateApi():
     input_ECG = request.args.get('input_ECG')
     result = calculate(input_age, input_systolicBP, input_diastolicBP,
                        input_troponin, input_chestpainandpainilefthandnadjaw, input_ECG)
-    return render_template('result.html', score=result['score'])
+    return render_template('result.html', score=result['score'], attachment=result['attachment'])
 
 
 if __name__ == '__main__':

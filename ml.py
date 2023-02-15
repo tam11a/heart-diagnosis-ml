@@ -254,7 +254,7 @@ def calculate(input_age, input_systolicBP, input_diastolicBP, input_troponin, in
              'k', linewidth=1.5, alpha=0.9)
     ax0.set_title('Centroid Deffuzification')
 
-    fileName = 'static/'+str(uuid.uuid4())+'.png'
+    fileName = "static/{}.png".format(str(uuid.uuid4()))
     plt.savefig(fileName)
     # plt.tight_layout()
 
