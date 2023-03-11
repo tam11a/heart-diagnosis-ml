@@ -1,7 +1,19 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, jsonify
 from ml import calculate
 import uuid
 import json
+import os
+
+# Path to the folder you want to create
+folder_path = "static"
+
+# Check if the folder exists, and create it if it doesn't
+if not os.path.exists(folder_path):
+    os.makedirs(folder_path)
+    print("Static folder created")
+else:
+    print("Static folder already exists")
+
 
 app = Flask(__name__)
 
@@ -15,13 +27,14 @@ with open('users.json') as f:
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    phone = data['phone']
+    email = data['email']
     password = data['password']
     name = data['name']
+    gender = data['gender']
 
-    # Check if user with phone number already exists
-    if any(user['phone'] == phone for user in users['users']):
-        return jsonify({'error': 'User with phone number already exists'}), 400
+    # Check if user with email already exists
+    if any(user['email'] == email for user in users['users']):
+        return jsonify({'error': 'User with email already exists'}), 400
 
     # Generate unique ID for user
     user_id = str(uuid.uuid4())
@@ -29,9 +42,10 @@ def register():
     # Add new user
     users['users'].append({
         'id': user_id,
-        'phone': phone,
+        'email': email,
         'password': password,
-        'name': name
+        'name': name,
+        'gender': gender
     })
 
     # Save updated user data to JSON file
@@ -45,18 +59,18 @@ def register():
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    phone = data['phone']
+    email = data['email']
     password = data['password']
 
-    # Find user with phone number
+    # Find user with email
     user = next(
-        (user for user in users['users'] if user['phone'] == phone), None)
+        (user for user in users['users'] if user['email'] == email), None)
 
     # Check if user exists and password is correct
     if user and user['password'] == password:
         return jsonify({'message': 'Login successful', 'user_id': user['id']}), 200
     else:
-        return jsonify({'error': 'Invalid phone number or password'}), 401
+        return jsonify({'error': 'Invalid email or password'}), 401
 
 
 # Profile endpoint
@@ -67,6 +81,7 @@ def profile():
     password = data['password']
     new_password = data.get('new_password')
     new_name = data.get('name')
+    new_gender = data.get('gender')
 
     # Find user with ID
     user = next(
@@ -79,6 +94,8 @@ def profile():
             user['password'] = new_password
         if new_name:
             user['name'] = new_name
+        if new_gender:
+            user['gender'] = new_gender
 
         # Save updated user data to JSON file
         with open('users.json', 'w') as f:
@@ -102,13 +119,9 @@ def get_profile(user_id):
     return jsonify({
         "id": user['id'],
         "name": user['name'],
-        "phone": user['phone']
+        "email": user['email'],
+        "gender": user['gender']
     })
-
-
-# @app.route('/')
-# def show_form():
-#     return render_template('form.html')
 
 
 @app.route('/calculate', methods=['GET'])
@@ -125,10 +138,17 @@ def calculateApi():
         result = calculate(input_age, input_systolicBP, input_diastolicBP,
                            input_troponin, input_chestpainandpainilefthandnadjaw, input_ECG)
         # return render_template('result.html', score=result['score'], attachment=result['attachment'])
-        return jsonify({**result, "name": json.loads(get_profile(user_id).get_data(True))["name"]})
+        user = json.loads(get_profile(user_id).get_data(True))
+        if not user:
+            return jsonify({
+                'error': 'User not found'
+            }), 404
+        return jsonify({**result, "name": user["name"], "gender": user["gender"]})
     except:
         return jsonify({'error': 'Something went wrong'}), 400
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(
+        # debug=True
+    )
