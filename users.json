@@ -1,3 +1,11 @@
 {
-	"users": []
+	"users": [
+		{
+			"id": "88c41961-2afc-4c9a-aadb-8b8e7c7db14d",
+			"email": "hello@tam11a.dev",
+			"password": "1234",
+			"name": "Tam",
+			"gender": "male"
+		}
+	]
 }
