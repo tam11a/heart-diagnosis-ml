@@ -3,6 +3,7 @@ from ml import calculate
 import uuid
 import json
 import os
+from flask_cors import CORS
 
 # Path to the folder you want to create
 folder_path = "static"
@@ -16,7 +17,7 @@ else:
 
 
 app = Flask(__name__)
-
+CORS(app)
 
 # Load users from JSON file
 with open('users.json') as f:
