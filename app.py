@@ -35,7 +35,7 @@ def register():
 
     # Check if user with email already exists
     if any(user['email'] == email for user in users['users']):
-        return jsonify({'error': 'User with email already exists'}), 400
+        return jsonify({'message': 'User with email already exists'}), 400
 
     # Generate unique ID for user
     user_id = str(uuid.uuid4())
@@ -71,7 +71,7 @@ def login():
     if user and user['password'] == password:
         return jsonify({'message': 'Login successful', 'user_id': user['id']}), 200
     else:
-        return jsonify({'error': 'Invalid email or password'}), 401
+        return jsonify({'message': 'Invalid email or password'}), 401
 
 
 # Profile endpoint
@@ -104,7 +104,7 @@ def profile():
 
         return jsonify({'message': 'Profile updated successfully'}), 200
     else:
-        return jsonify({'error': 'Invalid user ID or password'}), 401
+        return jsonify({'message': 'Invalid user ID or password'}), 401
 
 
 # Endpoint to get user profile information
@@ -115,7 +115,7 @@ def get_profile(user_id):
         (user for user in users['users'] if user['id'] == user_id), None)
 
     if not user:
-        return jsonify({'error': 'User not found'}), 404
+        return jsonify({'message': 'User not found'}), 404
 
     return jsonify({
         "id": user['id'],
@@ -142,11 +142,11 @@ def calculateApi():
         user = json.loads(get_profile(user_id).get_data(True))
         if not user:
             return jsonify({
-                'error': 'User not found'
+                'message': 'User not found'
             }), 404
         return jsonify({**result, "name": user["name"], "gender": user["gender"]})
     except:
-        return jsonify({'error': 'Something went wrong'}), 400
+        return jsonify({'message': 'Something went wrong'}), 400
 
 
 if __name__ == '__main__':
